@@ -9,27 +9,18 @@ import {
 } from 'react-icons/ai';
 import { Product } from '../../components';
 import { useState } from 'react';
+import { useStateContext } from '../../context/StateContext';
 
 type Props = {
-    product: {
-        image: [
-            {
-                _ref: string;
-                _type: string;
-            }
-        ];
-        name: string;
-        price: string;
-        details: string;
-    };
-    products: [ProductType];
+    product: ProductType;
+    products: [ProductsType];
 };
-type ProductType = {
-    _createdAt: Date;
+type ProductsType = {
+    _createdAt: string;
     _id: string;
     _rev: string;
     _type: string;
-    _updatedAt: Date;
+    _updatedAt: string;
     details: string;
     image: [
         {
@@ -47,13 +38,63 @@ type ProductType = {
         _type: string;
         current: string;
     };
+    quantity: number;
 };
 
-const ProductDetails: React.FC<Props> = ({
-    product: { image, name, price, details },
-    products,
-}) => {
+type ProductType = {
+    _createdAt: string;
+    _id: string;
+    _rev: string;
+    _type: string;
+    _updatedAt: string;
+    details: string;
+    image: [
+        {
+            _key: string;
+            _type: string;
+            asset: {
+                _ref: string;
+                _type: string;
+            };
+        },
+        {
+            _key: string;
+            _type: string;
+            asset: {
+                _ref: string;
+                _type: string;
+            };
+        },
+        {
+            _key: string;
+            _type: string;
+            asset: {
+                _ref: string;
+                _type: string;
+            };
+        },
+        {
+            _key: string;
+            _type: string;
+            asset: {
+                _ref: string;
+                _type: string;
+            };
+        }
+    ];
+    name: string;
+    price: number;
+    slug: {
+        _type: string;
+        current: string;
+    };
+    quantity: number;
+};
+
+const ProductDetails: React.FC<Props> = ({ product, products }) => {
+    const { image, name, price, details } = product;
     const [index, setIndex] = useState(0);
+    const { incQty, decQty, qty, cartItems, onAdd } = useStateContext();
 
     return (
         <div>
@@ -100,13 +141,18 @@ const ProductDetails: React.FC<Props> = ({
                     <div>
                         <p className="text-3xl">Quantity:</p>
                         <p>
-                            <span>{<AiOutlineMinus />}</span>
-                            <span>0</span>
-                            <span>{<AiOutlinePlus />}</span>
+                            <span onClick={decQty}>{<AiOutlineMinus />}</span>
+                            <span>{qty}</span>
+                            <span onClick={incQty}>{<AiOutlinePlus />}</span>
                         </p>
                     </div>
                     <div>
-                        <button type="button">Add To Cart</button>
+                        <button
+                            type="button"
+                            onClick={() => onAdd(product, qty)}
+                        >
+                            Add To Cart
+                        </button>
                         <button type="button">Buy Now</button>
                     </div>
                 </div>
@@ -115,7 +161,7 @@ const ProductDetails: React.FC<Props> = ({
                 <p className="text-xl">May like product</p>
                 <div>MArquee</div>
                 <div>
-                    {products.map((product: ProductType) => (
+                    {products.map((product: ProductsType) => (
                         <Product key={product._id} product={product} />
                     ))}
                 </div>
@@ -123,7 +169,6 @@ const ProductDetails: React.FC<Props> = ({
         </div>
     );
 };
-
 export const getStaticPaths: GetStaticPaths = async () => {
     const query = `*[_type == "product"] {
         slug {
@@ -146,7 +191,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-    console.log(params?.asd);
     const query = `*[_type == "product" && slug.current == '${params?.slug}'][0]`;
 
     const productsQuery = `*[_type == "product"]`;

@@ -9,11 +9,11 @@ interface HomeInterface {
 }
 
 export interface Product {
-    _createdAt: Date;
+    _createdAt: string;
     _id: string;
     _rev: string;
     _type: string;
-    _updatedAt: Date;
+    _updatedAt: string;
     details: string;
     image: [
         {
@@ -56,7 +56,6 @@ const Home: NextPage<HomeInterface> = ({ products, bannerData }) => {
                     <Product key={product._id} product={product} />
                 ))}
             </div>
-            {console.log(bannerData[0])}
             <FooterBanner footerBanner={bannerData && bannerData[0]} />
         </>
     );

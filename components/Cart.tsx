@@ -72,7 +72,7 @@ const Cart: React.FC = (props: Props) => {
                                         {/* TOP */}
                                         <div>
                                             <p>{item.name}</p>
-                                            <p>{item.price}</p>
+                                            <p>${item.price}</p>
                                         </div>
                                         {/* Bottom */}
                                         <div>

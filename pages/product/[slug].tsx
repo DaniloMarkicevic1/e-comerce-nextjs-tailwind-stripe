@@ -137,7 +137,7 @@ const ProductDetails: React.FC<Props> = ({ product, products }) => {
                     </div>
                     <p className="text-3xl">Details:</p>
                     <p className="text-3xl">{details}</p>
-                    <p>{price}</p>
+                    <p>${price}</p>
                     <div>
                         <p className="text-3xl">Quantity:</p>
                         <p>

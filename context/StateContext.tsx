@@ -111,13 +111,11 @@ type TypeState = {
     qty: number;
 };
 const reducer = (state: TypeState, action: TypeAction): TypeState => {
-    console.log(action.type);
-
     switch (action.type) {
         case 'show_cart':
             return { ...state, showCart: !state.showCart };
         case 'cart_item_quantity':
-            return { ...state, cartItems: action.payload };
+            return { ...state, cartItems[action.payload]= cartItems };
 
         case 'add_item_to_cart':
             return {
@@ -152,34 +150,43 @@ export const StateContext: React.FC<Props> = ({ children }) => {
     const toggleCartItemQuantity = (id: string, value: string) => {
         foundProduct = state.cartItems.find((item) => item._id === id);
         index = state.cartItems.findIndex((product) => product._id === id);
-
+        console.log(index);
         if (value === 'inc') {
             let newCartItems = [
                 {
-                    foundProduct: {
-                        ...foundProduct,
-                        quantity: foundProduct.quantity + 1,
-                    },
+                    ...state,
+                    ...foundProduct,
+                    quantity: foundProduct.quantity + 1,
                 },
             ];
-            console.log(newCartItems);
-            dispatch({ type: 'cart_item_quantity', payload: newCartItems });
+            console.log(state);
+            dispatch({
+                type: 'total_price',
+                payload: state.cartItems[index].price,
+            });
+            dispatch({
+                type: 'total_quantities',
+                payload: 1,
+            });
+            dispatch({ type: 'inc_qty', payload: newCartItems });
         }
-        // if (value === 'dec') {
-        //     if (foundProduct?.quantity > 1) {
-        //         let newCartItems = [
-        //             ...state.cartItems,
-        //             (foundProduct = {
-        //                 ...foundProduct,
-        //                 quantity: foundProduct.quantity - 1,
-        //             }),
-        //         ];
-        //         dispatch({
-        //             type: 'cart_item_quantity',
-        //             payload: newCartItems,
-        //         });
-        //     }
-        // }
+        if (value === 'dec') {
+            if (foundProduct?.quantity > 1) {
+                let newCartItems = [
+                    { ...foundProduct, quantity: foundProduct.quantity - 1 },
+                ];
+                const decPrice = state.cartItems[index].price;
+                dispatch({
+                    type: 'total_price',
+                    payload: -decPrice,
+                });
+                dispatch({
+                    type: 'total_quantities',
+                    payload: -1,
+                });
+                // dispatch({ type: 'cart_item_quantity', payload: newCartItems });
+            }
+        }
     };
 
     const onAdd = (product: ProductType, quantity: number) => {

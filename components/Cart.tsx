@@ -25,7 +25,10 @@ const Cart: React.FC = (props: Props) => {
     } = useStateContext()!;
 
     return (
-        <div className="absolute right-0 bg-gray-300 h-max" ref={cartRef}>
+        <div
+            className="absolute right-0 bg-gray-600 flex flex-column text-white"
+            // ref={cartRef}
+        >
             <div className="">
                 <button
                     type="button"
@@ -52,21 +55,16 @@ const Cart: React.FC = (props: Props) => {
                     </div>
                 )}
                 {/* Loop trough producs */}
-                <div style={{ display: 'flex', margin: '25px 0 50px 0' }}>
+                <div className="mx-15 my-20">
                     {cartItems.length >= 1 &&
                         cartItems.map((item, i) => {
                             return (
                                 <div key={item._id} style={{ display: 'flex' }}>
-                                    {/* <img
+                                    <img
                                         src={urlFor(item?.image[0])}
                                         alt="product"
-                                        style={{
-                                            backgroundColor: 'black',
-                                            width: '100px',
-                                            height: '100px',
-                                        }}
-                                    /> */}
-                                    IMG GOES HERE:
+                                        className="w-[100px] h-[100px] bg-gray-400"
+                                    />
                                     {/* Description */}
                                     <div>
                                         {/* TOP */}
@@ -76,39 +74,49 @@ const Cart: React.FC = (props: Props) => {
                                         </div>
                                         {/* Bottom */}
                                         <div>
-                                            <p className="text-3xl">
-                                                Quantity:
-                                            </p>
-                                            <p>
-                                                <span
+                                            <div className="flex mb-6">
+                                                <p className="text-2xl text-gray-600">
+                                                    Quantity:
+                                                </p>
+                                                <p className="flex items-center">
+                                                    <button
+                                                        type="button"
+                                                        className="border-2 border-red-200 vertical p-2 max-h-8"
+                                                        onClick={() =>
+                                                            toggleCartItemQuanitity(
+                                                                item._id,
+                                                                'inc'
+                                                            )
+                                                        }
+                                                    >
+                                                        <AiOutlinePlus />
+                                                    </button>
+                                                    <span className="leading-3 border-2 border-red-200 vertical p-2 max-h-8">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        className="border-2 border-red-200 vertical p-2 max-h-8"
+                                                        onClick={() =>
+                                                            toggleCartItemQuanitity(
+                                                                item._id,
+                                                                'dec'
+                                                            )
+                                                        }
+                                                    >
+                                                        <AiOutlineMinus />
+                                                    </button>
+                                                </p>
+                                                <button
+                                                    type="button"
+                                                    className="text-red-700 text-2xl"
                                                     onClick={() =>
-                                                        toggleCartItemQuanitity(
-                                                            item._id,
-                                                            'dec'
-                                                        )
+                                                        onRemove(item)
                                                     }
                                                 >
-                                                    {<AiOutlineMinus />}
-                                                </span>
-                                                <span>{item.quantity}</span>
-                                                <span
-                                                    onClick={() =>
-                                                        toggleCartItemQuanitity(
-                                                            item._id,
-                                                            'inc'
-                                                        )
-                                                    }
-                                                >
-                                                    <AiOutlinePlus />
-                                                </span>
-                                            </p>
-                                            <button
-                                                type="button"
-                                                className="remove"
-                                                onClick={() => onRemove(item)}
-                                            >
-                                                <TiDeleteOutline />
-                                            </button>
+                                                    <TiDeleteOutline />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -122,9 +130,9 @@ const Cart: React.FC = (props: Props) => {
                             </div>
 
                             <div>
-                                <button type="button" onClick={''}>
+                                {/* <button type="button" onClick={''}>
                                     Pay with Stripe
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     )}

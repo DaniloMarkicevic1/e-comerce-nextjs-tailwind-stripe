@@ -1,16 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { urlFor } from '../lib/client';
-import { Product } from '../pages';
-type Props = { product: Product };
+import { ProductType } from '../models/Product';
+
+type Props = { product: ProductType };
 
 const Product: React.FC<Props> = ({
     product: { image, name, slug, price },
 }) => {
     return (
-        <div>
+        <div className="bg-gray-300 m-2 rounded-md p-3 hover:cursor-pointer">
             <Link href={`/product/${slug.current}`} passHref>
-                <div className="border-solid border-2 border-black-700">
+                <div className="text-center">
                     <img
                         src={urlFor(image && image[0])}
                         width={250}
@@ -18,7 +19,7 @@ const Product: React.FC<Props> = ({
                         alt="headphones"
                     />
                     <p>{name}</p>
-                    <p>${price}</p>
+                    <p className="font-bold">${price}</p>
                 </div>
             </Link>
         </div>

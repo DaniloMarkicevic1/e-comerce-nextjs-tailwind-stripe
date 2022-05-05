@@ -30,11 +30,13 @@ type Props = {
 
 const HeroBanner: React.FC<Props> = ({ heroBanner }) => {
     return (
-        <div>
-            <div>
+        <div className="bg-gray-300 rounded-md w-4/6 grid mx-auto my-0 py-2 px-20 grid-cols-2 justify-center items-center">
+            <div className="text-left">
                 <p className="text-lg">{heroBanner?.smallText} </p>
                 <p className="text-6xl font-bold">{heroBanner?.midText}</p>
-                <p className="text-6xl font-bold">{heroBanner?.largeText1}</p>
+                <p className="text-6xl font-bold text-white">
+                    {heroBanner?.largeText1}
+                </p>
                 <img
                     src={urlFor(heroBanner?.image)}
                     width={200}
@@ -42,12 +44,17 @@ const HeroBanner: React.FC<Props> = ({ heroBanner }) => {
                     alt="headphones"
                 />
             </div>
-            <div>
+            <div className="text-center">
                 <Link href={'/product/:ID'} passHref>
-                    <button type="button">{heroBanner?.buttonText}</button>
+                    <button
+                        type="button"
+                        className="bg-red-500 rounded-md py-2 px-5 text-white"
+                    >
+                        {heroBanner?.buttonText}
+                    </button>
                 </Link>
                 <div>
-                    <p className="text-3xl">Description</p>
+                    <p className="text-3xl">Description:</p>
                     <p>{heroBanner?.desc}</p>
                 </div>
             </div>

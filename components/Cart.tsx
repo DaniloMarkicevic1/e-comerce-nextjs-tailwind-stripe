@@ -19,16 +19,18 @@ const Cart: React.FC = (props: Props) => {
         totalPrice,
         totalQuantities,
         cartItems,
-        dispatch,
-        toggleCartItemQuantity,
-    } = useStateContext();
+        setShowCart,
+        toggleCartItemQuanitity,
+        onRemove,
+    } = useStateContext()!;
+
     return (
-        <div className="wrapper" ref={cartRef}>
-            <div className="container">
+        <div className="absolute right-0 bg-gray-300 h-max" ref={cartRef}>
+            <div className="">
                 <button
                     type="button"
                     className="cart-heading"
-                    onClick={() => dispatch({ type: 'show_cart', payload: '' })}
+                    onClick={() => setShowCart(false)}
                 >
                     <AiOutlineLeft />
                     <span>Your Cart: </span>
@@ -42,9 +44,7 @@ const Cart: React.FC = (props: Props) => {
                         <Link href={'/'} passHref>
                             <button
                                 type="button"
-                                onClick={() =>
-                                    dispatch({ type: 'show_cart', payload: '' })
-                                }
+                                onClick={() => setShowCart(false)}
                             >
                                 Continue Shopping
                             </button>
@@ -82,7 +82,7 @@ const Cart: React.FC = (props: Props) => {
                                             <p>
                                                 <span
                                                     onClick={() =>
-                                                        toggleCartItemQuantity(
+                                                        toggleCartItemQuanitity(
                                                             item._id,
                                                             'dec'
                                                         )
@@ -93,19 +93,19 @@ const Cart: React.FC = (props: Props) => {
                                                 <span>{item.quantity}</span>
                                                 <span
                                                     onClick={() =>
-                                                        toggleCartItemQuantity(
+                                                        toggleCartItemQuanitity(
                                                             item._id,
                                                             'inc'
                                                         )
                                                     }
                                                 >
-                                                    {<AiOutlinePlus />}
+                                                    <AiOutlinePlus />
                                                 </span>
                                             </p>
                                             <button
                                                 type="button"
                                                 className="remove"
-                                                onClick=""
+                                                onClick={() => onRemove(item)}
                                             >
                                                 <TiDeleteOutline />
                                             </button>

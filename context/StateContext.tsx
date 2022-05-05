@@ -1,236 +1,138 @@
-import {
+import React, {
     createContext,
-    Dispatch,
-    ReactNode,
-    Reducer,
-    ReducerAction,
-    ReducerState,
     useContext,
-    useEffect,
-    useReducer,
     useState,
+    useEffect,
+    ReactNode,
 } from 'react';
 import { toast } from 'react-hot-toast';
+import { ContextType } from '../models/Context';
+import { ProductType } from '../models/Product';
 
-const initialState: TypeState = {
-    showCart: false,
-    cartItems: [],
-    totalPrice: 0,
-    totalQuantities: 0,
-    qty: 1,
-};
-type ProductType = {
-    quantity: number;
-    _createdAt: string;
-    _id: string;
-    _rev: string;
-    _type: string;
-    _updatedAt: string;
-    details: string;
-    image: [
-        {
-            _key: string;
-            _type: string;
-            asset: {
-                _ref: string;
-                _type: string;
-            };
-        },
-        {
-            _key: string;
-            _type: string;
-            asset: {
-                _ref: string;
-                _type: string;
-            };
-        },
-        {
-            _key: string;
-            _type: string;
-            asset: {
-                _ref: string;
-                _type: string;
-            };
-        },
-        {
-            _key: string;
-            _type: string;
-            asset: {
-                _ref: string;
-                _type: string;
-            };
-        }
-    ];
-    name: string;
-    price: number;
-    slug: {
-        _type: string;
-        current: string;
-    };
-};
-
-const initialContext: ContextType = {
-    showCart: false,
-    cartItems: [],
-    totalPrice: 0,
-    totalQuantities: 0,
-    qty: 1,
-    dispatch: () => {},
-    incQty: () => {},
-    decQty: () => {},
-    onAdd: (product: ProductType, quantity: number) => {},
-    toggleCartItemQuantity: (id, value) => {},
-};
-type ContextType = {
-    showCart: boolean;
-    cartItems: [ProductType];
-    totalPrice: number;
-    totalQuantities: number;
-    qty: number;
-    dispatch: Dispatch<TypeAction>;
-    incQty: () => void;
-    decQty: () => void;
-    onAdd: (product: ProductType, quantity: number) => void;
-    toggleCartItemQuantity: (id: string, value: string) => void;
-};
-const Context = createContext(initialContext);
-
+const Context = createContext<ContextType | undefined>(undefined);
 type Props = {
     children: ReactNode;
 };
 
-type TypeAction = {
-    type: string;
-    payload: any;
-};
-type TypeState = {
-    showCart: boolean;
-    cartItems: [ProductType];
-    totalPrice: number;
-    totalQuantities: number;
-    qty: number;
-};
-const reducer = (state: TypeState, action: TypeAction): TypeState => {
-    switch (action.type) {
-        case 'show_cart':
-            return { ...state, showCart: !state.showCart };
-        case 'cart_item_quantity':
-            return { ...state, cartItems[action.payload]= cartItems };
-
-        case 'add_item_to_cart':
-            return {
-                ...state,
-                cartItems: [...state.cartItems, action.payload],
-            };
-        case 'total_price':
-            return {
-                ...state,
-                totalPrice: state.totalPrice + action.payload * state.qty,
-            };
-        case 'total_quantities':
-            return {
-                ...state,
-                totalQuantities: state.totalQuantities + action.payload,
-            };
-        case 'inc_qty':
-            return { ...state, qty: state.qty + 1 };
-        case 'dec_qty':
-            if (state.qty - 1 < 1) return state;
-            return { ...state, qty: state.qty - 1 };
-        default:
-            return state;
-    }
-};
-
 export const StateContext: React.FC<Props> = ({ children }) => {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [showCart, setShowCart] = useState(false);
+    const [cartItems, setCartItems] = useState<ProductType[]>([]);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalQuantities, setTotalQuantities] = useState(0);
+    const [qty, setQty] = useState(1);
 
-    let foundProduct;
-    let index;
-    const toggleCartItemQuantity = (id: string, value: string) => {
-        foundProduct = state.cartItems.find((item) => item._id === id);
-        index = state.cartItems.findIndex((product) => product._id === id);
-        console.log(index);
-        if (value === 'inc') {
-            let newCartItems = [
-                {
-                    ...state,
-                    ...foundProduct,
-                    quantity: foundProduct.quantity + 1,
-                },
-            ];
-            console.log(state);
-            dispatch({
-                type: 'total_price',
-                payload: state.cartItems[index].price,
-            });
-            dispatch({
-                type: 'total_quantities',
-                payload: 1,
-            });
-            dispatch({ type: 'inc_qty', payload: newCartItems });
+    let foundProduct: ProductType;
+    let index: number;
+
+    const onAdd = (product: ProductType, quantity: number) => {
+        const checkProductInCart = cartItems.find(
+            (item) => item._id === product._id
+        );
+
+        setTotalPrice(
+            (prevTotalPrice) => prevTotalPrice + product.price * quantity
+        );
+        setTotalQuantities(
+            (prevTotalQuantities) => prevTotalQuantities + quantity
+        );
+
+        if (checkProductInCart) {
+            const updatedCartItems: ProductType | any = cartItems.map(
+                (cartProduct) => {
+                    if (cartProduct._id === product._id)
+                        return {
+                            ...cartProduct,
+                            quantity: cartProduct.quantity + quantity,
+                        };
+                }
+            );
+            setCartItems(updatedCartItems);
+        } else {
+            product.quantity = quantity;
+
+            setCartItems([...cartItems, { ...product }]);
         }
-        if (value === 'dec') {
-            if (foundProduct?.quantity > 1) {
-                let newCartItems = [
+
+        toast.success(`${qty} ${product.name} added to the cart.`);
+    };
+
+    const onRemove = (product: ProductType) => {
+        foundProduct = cartItems.find((item) => item._id === product._id)!;
+        const newCartItems = cartItems.filter(
+            (item) => item._id !== product._id
+        );
+
+        setTotalPrice(
+            (prevTotalPrice) =>
+                prevTotalPrice - foundProduct.price * foundProduct.quantity
+        );
+        setTotalQuantities(
+            (prevTotalQuantities) => prevTotalQuantities - foundProduct.quantity
+        );
+        setCartItems(newCartItems);
+    };
+
+    const toggleCartItemQuanitity = (id: string, value: string) => {
+        foundProduct = cartItems.find((item) => item._id === id)!;
+        index = cartItems.findIndex((product) => product._id === id);
+        const newCartItems = cartItems.filter((item) => item._id !== id);
+
+        if (value === 'inc') {
+            setCartItems([
+                ...newCartItems,
+                { ...foundProduct, quantity: foundProduct.quantity + 1 },
+            ]);
+            setTotalPrice(
+                (prevTotalPrice) => prevTotalPrice + foundProduct.price
+            );
+            setTotalQuantities(
+                (prevTotalQuantities) => prevTotalQuantities + 1
+            );
+        } else if (value === 'dec') {
+            if (foundProduct.quantity > 1) {
+                setCartItems([
+                    ...newCartItems,
                     { ...foundProduct, quantity: foundProduct.quantity - 1 },
-                ];
-                const decPrice = state.cartItems[index].price;
-                dispatch({
-                    type: 'total_price',
-                    payload: -decPrice,
-                });
-                dispatch({
-                    type: 'total_quantities',
-                    payload: -1,
-                });
-                // dispatch({ type: 'cart_item_quantity', payload: newCartItems });
+                ]);
+                setTotalPrice(
+                    (prevTotalPrice) => prevTotalPrice - foundProduct.price
+                );
+                setTotalQuantities(
+                    (prevTotalQuantities) => prevTotalQuantities - 1
+                );
             }
         }
     };
 
-    const onAdd = (product: ProductType, quantity: number) => {
-        const checkProductInCart = state.cartItems.find(
-            (item: any) => item._id === product._id
-        );
-
-        dispatch({ type: 'total_price', payload: product.price });
-        dispatch({ type: 'total_quantities', payload: quantity });
-        if (checkProductInCart) {
-            state.cartItems.map((cartProduct) => {
-                if (cartProduct._id === product._id)
-                    return {
-                        quantity: cartProduct.quantity + quantity,
-                    };
-            });
-        } else {
-            product.quantity = quantity;
-
-            dispatch({ type: 'add_item_to_cart', payload: product });
-        }
-        toast.success(`${state.qty} ${product.name} added to the cart`);
-    };
-
     const incQty = () => {
-        dispatch({ type: 'inc_qty', payload: '' });
+        setQty((prevQty) => prevQty + 1);
     };
+
     const decQty = () => {
-        dispatch({ type: 'dec_qty', payload: '' });
+        setQty((prevQty) => {
+            if (prevQty - 1 < 1) return 1;
+
+            return prevQty - 1;
+        });
     };
 
     return (
         <Context.Provider
             value={{
-                showCart: state.showCart,
-                totalPrice: state.totalPrice,
-                cartItems: state.cartItems,
-                totalQuantities: state.totalQuantities,
-                qty: state.qty,
-                dispatch,
+                showCart,
+                setShowCart,
+                cartItems,
+                totalPrice,
+                totalQuantities,
+                qty,
                 incQty,
                 decQty,
                 onAdd,
-                toggleCartItemQuantity,
+                toggleCartItemQuanitity,
+                onRemove,
+                setCartItems,
+                setTotalPrice,
+                setTotalQuantities,
             }}
         >
             {children}
@@ -238,7 +140,4 @@ export const StateContext: React.FC<Props> = ({ children }) => {
     );
 };
 
-export const useStateContext = () => {
-    const stateContext = useContext(Context);
-    return stateContext;
-};
+export const useStateContext = () => useContext(Context);

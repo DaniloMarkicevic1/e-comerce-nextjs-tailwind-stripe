@@ -4,9 +4,9 @@ type Props = {};
 
 const Footer = (props: Props) => {
     return (
-        <div>
-            <p>2022 JSM Headphones All rights reserved</p>
-            <p>
+        <div className="flex flex-col justify-center text-center">
+            <p>&copy; 2022 JSM Headphones All rights reserved</p>
+            <p className="flex mx-auto">
                 <AiFillInstagram />
                 <AiOutlineTwitter />
             </p>
